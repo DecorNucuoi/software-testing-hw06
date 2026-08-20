@@ -1,0 +1,65 @@
+name: API Tests (Newman)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout HW06 repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Checkout SUT (EShop)
+        uses: actions/checkout@v4
+        with:
+          repository: ttbhanh/eshop-sut
+          path: sut
+
+      - name: Install SUT dependencies & seed database
+        working-directory: sut/backend
+        run: |
+          npm install
+          node database.js
+
+      - name: Start EShop backend
+        working-directory: sut/backend
+        run: |
+          nohup node server.js > server.log 2>&1 &
+          npx wait-on http://localhost:3000/api/products --timeout 60000
+          echo "Backend is up:"
+          curl -s http://localhost:3000/api/products | head -c 300
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run API test collection
+        run: |
+          mkdir -p newman
+          newman run postman/EShop_HW06.postman_collection.json \
+            -e postman/EShop_HW06.postman_environment.json \
+            --env-var "baseUrl=http://localhost:3000" \
+            --env-var "studentId=23127362" \
+            -r cli,htmlextra,junit \
+            --reporter-htmlextra-export newman/ci-report.html \
+            --reporter-junit-export newman/ci-report.xml
+
+      - name: Upload Newman reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: newman/
+
+      - name: Dump backend log on failure
+        if: failure()
+        run: cat sut/backend/server.log || true
