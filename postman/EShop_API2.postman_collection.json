@@ -1,0 +1,3276 @@
+{
+ "info": {
+  "_postman_id": "api2-fr09-23127362",
+  "name": "EShop-HW06-API2-FR09",
+  "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+ },
+ "event": [
+  {
+   "listen": "prerequest",
+   "script": {
+    "type": "text/javascript",
+    "exec": [
+     "const sid=pm.collectionVariables.get('studentId')||'23127362';",
+     "pm.request.headers.upsert({key:'X-Student-Id',value:sid});",
+     "if(!pm.collectionVariables.get('sfx')) pm.collectionVariables.set('sfx', String(Date.now()));"
+    ]
+   }
+  }
+ ],
+ "item": [
+  {
+   "name": "00-SETUP",
+   "item": [
+    {
+     "name": "SETUP login admin",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b.token)pm.collectionVariables.set('adminToken',b.token);pm.test('admin 200',()=>pm.response.to.have.status(200));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/login",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "login"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"email\":\"{{adminEmail}}\",\"password\":\"{{adminPassword}}\"}"
+      }
+     }
+    },
+    {
+     "name": "SETUP login user A",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b.token)pm.collectionVariables.set('userToken',b.token);if(b.user&&b.user.id)pm.collectionVariables.set('uidA',b.user.id);pm.test('user 200',()=>pm.response.to.have.status(200));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/login",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "login"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"email\":\"{{userEmail}}\",\"password\":\"{{userPassword}}\"}"
+      }
+     }
+    },
+    {
+     "name": "SETUP register user B",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('register 2xx/ok',()=>pm.expect([200,201,400,409]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/register",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "register"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"name\":\"QA Bob\",\"email\":\"qa.bob.23127362@eshop.com\",\"password\":\"Bob12345!\"}"
+      }
+     }
+    },
+    {
+     "name": "SETUP login user B",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b.token)pm.collectionVariables.set('tokenB',b.token);if(b.user&&b.user.id)pm.collectionVariables.set('uidB',b.user.id);pm.test('userB login',()=>pm.response.to.have.status(200));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/login",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "login"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"email\":\"qa.bob.23127362@eshop.com\",\"password\":\"Bob12345!\"}"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "API2-Domain",
+   "item": [
+    {
+     "name": "TC-001 SAVE10 hop le (percent 10%)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 50000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(50000);});",
+         "pm.test('final_amount === 450000',()=>pm.expect(b.final_amount).to.eql(450000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-002 SAVE10 @1jr - percent ti le (phan biet loai 1/2)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 100000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(100000);});",
+         "pm.test('final_amount === 900000',()=>pm.expect(b.final_amount).to.eql(900000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":1000000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-003 bien C3 = nguong (SAVE10 @300000)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 30000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(30000);});",
+         "pm.test('final_amount === 270000',()=>pm.expect(b.final_amount).to.eql(270000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":300000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-006 bien C3 = nguong fixed (BIGBUY @500000)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 50000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(50000);});",
+         "pm.test('final_amount === 450000',()=>pm.expect(b.final_amount).to.eql(450000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"BIGBUY\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-008 BIGBUY @1jr fixed (phan biet loai 2/2)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 50000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(50000);});",
+         "pm.test('final_amount === 950000',()=>pm.expect(b.final_amount).to.eql(950000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"BIGBUY\",\"total_amount\":1000000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-011 VIP100 @1jr - bat nham type",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 100000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(100000);});",
+         "pm.test('final_amount === 900000',()=>pm.expect(b.final_amount).to.eql(900000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"VIP100\",\"total_amount\":1000000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-014 C1 ma khong ton tai",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [404] (spec)',()=>pm.expect([404]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"NOTFOUND999\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-015 C1 sai hoa/thuong (save10)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [404] (spec)',()=>pm.expect([404]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"save10\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-016 code rong",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-017 thieu code",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-025 C3 duoi nguong",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":100000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-026 bien C3 min-1 (299999)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":299999,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-029 total=0",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         "pm.test('khong tra 200 kem discount',()=>{if(pm.response.code===200){const b=pm.response.json();pm.expect(b.discount_amount,'discount o total=0').to.be.undefined;}});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":0,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-031 total am -500000 (khong final am)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         "pm.test('final khong am neu 200',()=>{if(pm.response.code===200){const b=pm.response.json();pm.expect(b.final_amount).to.be.at.least(0);}});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":-500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-033 total la chuoi \"500000\"",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":\"500000\",\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-034 total la chuoi 'abc' (khong NaN)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         "pm.test('khong co NaN',()=>pm.expect(pm.response.text()).to.not.match(/NaN/));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":\"abc\",\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-035 thieu total_amount",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-038 thieu user_id - danh tinh tu token",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 50000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(50000);});",
+         "pm.test('final_amount === 450000',()=>pm.expect(b.final_amount).to.eql(450000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":500000}"
+      }
+     }
+    },
+    {
+     "name": "TC-041 C4 khong token (ky vong 401)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [401] (spec)',()=>pm.expect([401]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-043 C4 token rac (ky vong 401)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [401] (spec)',()=>pm.expect([401]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer abc123"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "TC-047 C2 ma het han EXPIRED (400 khong 404)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         "pm.test('phai 400 khong 404 (ma co ton tai)',()=>pm.expect(pm.response.code).to.eql(400));pm.test('khong tra discount cho ma het han',()=>{if(pm.response.code===200){const b=pm.response.json();pm.expect(b.discount_amount).to.be.undefined;}});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"EXPIRED\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "API2-StateTransition",
+   "item": [
+    {
+     "name": "S-001a tao ma STLIFE",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b&&b.id)pm.collectionVariables.set('idLife',b.id);pm.test('tao ma 2xx',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"STLIFE_{{sfx}}\",\"type\":\"fixed\",\"discount_value\":20000,\"min_order_amount\":0,\"expired_at\":\"2099-12-31\",\"max_uses_per_user\":1}"
+      }
+     }
+    },
+    {
+     "name": "S-001b apply STLIFE (S1 -> 200)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 20000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(20000);});",
+         "pm.test('final_amount === 380000',()=>pm.expect(b.final_amount).to.eql(380000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"STLIFE_{{sfx}}\",\"total_amount\":400000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "S-001c xoa STLIFE",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('delete 2xx',()=>pm.expect([200,204]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "DELETE",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons/{{idLife}}",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons",
+        "{{idLife}}"
+       ]
+      }
+     }
+    },
+    {
+     "name": "S-001d apply STLIFE sau xoa (S3 -> 404)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [404] (spec)',()=>pm.expect([404]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"STLIFE_{{sfx}}\",\"total_amount\":400000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "S-004a tao ma STACC max=2",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b&&b.id)pm.collectionVariables.set('idAcc',b.id);pm.test('tao 2xx',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"STACC_{{sfx}}\",\"type\":\"fixed\",\"discount_value\":20000,\"min_order_amount\":0,\"expired_at\":\"2099-12-31\",\"max_uses_per_user\":2}"
+      }
+     }
+    },
+    {
+     "name": "S-004b apply lan 1 (U=0 -> 200)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 20000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(20000);});",
+         "pm.test('final_amount === 380000',()=>pm.expect(b.final_amount).to.eql(380000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"STACC_{{sfx}}\",\"total_amount\":400000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "S-004c ghi luot 1",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('usage 2xx',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupon-usage",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupon-usage"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"coupon_id\":{{idAcc}}}"
+      }
+     }
+    },
+    {
+     "name": "S-004d apply lan 2 (U=1 -> 200)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));",
+         "const b=pm.response.json();",
+         "pm.test('discount_amount === 20000 (number)',()=>{pm.expect(b.discount_amount).to.be.a('number');pm.expect(b.discount_amount).to.eql(20000);});",
+         "pm.test('final_amount === 380000',()=>pm.expect(b.final_amount).to.eql(380000));",
+         "pm.test('final khong am',()=>pm.expect(b.final_amount).to.be.at.least(0));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"STACC_{{sfx}}\",\"total_amount\":400000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "S-004e ghi luot 2",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('usage 2xx',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupon-usage",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupon-usage"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"coupon_id\":{{idAcc}}}"
+      }
+     }
+    },
+    {
+     "name": "S-004f apply lan 3 (U=2 het luot -> 400)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"STACC_{{sfx}}\",\"total_amount\":400000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "S-004g don dep xoa STACC",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('cleanup',()=>pm.expect([200,204]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "DELETE",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons/{{idAcc}}",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons",
+        "{{idAcc}}"
+       ]
+      }
+     }
+    },
+    {
+     "name": "S-005 USE coupon_id khong ton tai (khong 500)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400, 404] (spec)',()=>pm.expect([400, 404]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupon-usage",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupon-usage"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"coupon_id\":999999}"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "API2-Security",
+   "item": [
+    {
+     "name": "SEC-001 SQLi tautology code",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [404, 400] (spec)',()=>pm.expect([404, 400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         "pm.test('khong ap dung duoc',()=>{if(pm.response.code===200){const b=pm.response.json();pm.expect(b.discount_amount).to.be.undefined;}});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10' OR '1'='1\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SEC-003 SQLi UNION rut users",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [404, 400] (spec)',()=>pm.expect([404, 400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         "pm.test('khong lo credential',()=>pm.expect(pm.response.text()).to.not.match(/@eshop|Admin123|Test1234/));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"' UNION SELECT id,email,password,role FROM users--\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SEC-004 SQLi DROP TABLE",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [404, 400] (spec)',()=>pm.expect([404, 400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10'; DROP TABLE coupons;--\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SEC-004b INTEG - coupons con nguyen",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('coupons con 4 ma',()=>{const b=pm.response.json();pm.expect(b.length).to.be.at.least(4);});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupons"
+       ]
+      }
+     }
+    },
+    {
+     "name": "SEC-007 SQLi qua total_amount",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":\"500000 OR 1=1\",\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SEC-009 IDOR - A het luot muon danh tinh B (setup)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b&&b.id)pm.collectionVariables.set('idI1',b.id);pm.test('setup',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"IDOR1_{{sfx}}\",\"type\":\"fixed\",\"discount_value\":20000,\"min_order_amount\":0,\"expired_at\":\"2099-12-31\",\"max_uses_per_user\":1}"
+      }
+     }
+    },
+    {
+     "name": "SEC-009b A ghi luot IDOR1 (het luot)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('2xx',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupon-usage",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupon-usage"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"coupon_id\":{{idI1}}}"
+      }
+     }
+    },
+    {
+     "name": "SEC-009c A xac nhan het luot (400)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [400] (spec)',()=>pm.expect([400]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"IDOR1_{{sfx}}\",\"total_amount\":400000,\"user_id\":{{uidA}}}"
+      }
+     }
+    },
+    {
+     "name": "SEC-009d IDOR: A doi user_id=B (ky vong 400 - dung token)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('[SPEC] van 400 vi C5 phai theo token A',()=>pm.expect(pm.response.code).to.eql(400));",
+         "pm.test('[IDOR] neu 200 => dem C5 theo body user_id (lo hong)',()=>{if(pm.response.code===200)pm.expect.fail('IDOR: ne duoc han muc bang user_id body');});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"IDOR1_{{sfx}}\",\"total_amount\":400000,\"user_id\":{{uidB}}}"
+      }
+     }
+    },
+    {
+     "name": "SEC-009e don dep IDOR1",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('cleanup',()=>pm.expect([200,204]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "DELETE",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons/{{idI1}}",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons",
+        "{{idI1}}"
+       ]
+      }
+     }
+    },
+    {
+     "name": "SEC-011 leo quyen: USER tao ma admin (ky vong 403)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('[SPEC] SEC-03 phai 403',()=>pm.expect(pm.response.code).to.eql(403));",
+         "const b=pm.response.json();if(b&&b.id)pm.collectionVariables.set('idPriv',b.id);",
+         "pm.test('[SEC-03] neu 2xx => user thuong tao duoc ma (lo hong)',()=>{if([200,201].includes(pm.response.code))pm.expect.fail('SEC-03 violated: user created coupon');});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"PRIVESC_{{sfx}}\",\"type\":\"fixed\",\"discount_value\":50000,\"min_order_amount\":0,\"expired_at\":\"2099-12-31\",\"max_uses_per_user\":1}"
+      }
+     }
+    },
+    {
+     "name": "SEC-011b don dep PRIVESC neu lo tao",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('cleanup (bo qua neu khong ton tai)',()=>pm.expect(true).to.be.true);"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "DELETE",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons/{{idPriv}}",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons",
+        "{{idPriv}}"
+       ]
+      }
+     }
+    },
+    {
+     "name": "SEC-014 JWT sai chu ky tren GET /coupons",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [401, 403] (spec)',()=>pm.expect([401, 403]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6ImFkbWluIn0.FAKESIG"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupons"
+       ]
+      }
+     }
+    },
+    {
+     "name": "SEC-015 JWT alg:none tren GET /coupons",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status in [401, 403] (spec)',()=>pm.expect([401, 403]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[A-NOLEAK]',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|no such table|syntax error|at .*:\\d+:\\d+|<html|<!DOCTYPE|node_modules/i));",
+         ""
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJpZCI6MSwicm9sZSI6ImFkbWluIn0."
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupons"
+       ]
+      }
+     }
+    },
+    {
+     "name": "SEC-017 mass-assign discount_value (BIGBUY @600000)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('status 200',()=>pm.response.to.have.status(200));const b=pm.response.json();",
+         "pm.test('[SEC-06] discount theo CSDL=50000 khong theo body',()=>pm.expect(b.discount_amount).to.eql(50000));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"BIGBUY\",\"total_amount\":600000,\"user_id\":1,\"discount_value\":499000}"
+      }
+     }
+    },
+    {
+     "name": "SEC-019 INTEG mass-assign - BIGBUY config khong doi",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();const big=b.find(c=>c.code==='BIGBUY');",
+         "pm.test('BIGBUY.discount_value van 50000',()=>pm.expect(big.discount_value).to.eql(50000));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "GET",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupons"
+       ]
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "API2-Schema",
+   "item": [
+    {
+     "name": "SCH-001 response 200 khop schema",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const schema={type:'object',required:['discount_amount','final_amount'],properties:{discount_amount:{type:'number'},final_amount:{type:'number'}},additionalProperties:true};",
+         "pm.test('khop schema (co discount+final number)',()=>pm.response.to.have.jsonSchema(schema));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"BIGBUY\",\"total_amount\":600000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SCH-002 kieu number + lien truong (VIP100 @600000)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();const raw=pm.response.text();",
+         "pm.test('discount la number',()=>pm.expect(b.discount_amount).to.be.a('number'));",
+         "pm.test('final la number',()=>pm.expect(b.final_amount).to.be.a('number'));",
+         "pm.test('final=total-discount',()=>pm.expect(b.final_amount).to.eql(600000-b.discount_amount));",
+         "pm.test('final>=0',()=>pm.expect(b.final_amount).to.be.at.least(0));",
+         "pm.test('discount la integer',()=>pm.expect(Number.isInteger(b.discount_amount)).to.be.true);"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"VIP100\",\"total_amount\":600000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SCH-003 loi 400 (C3) khop schema loi",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('400',()=>pm.response.to.have.status(400));pm.test('co error/message',()=>{const b=pm.response.json();pm.expect((typeof b.error==='string')||(typeof b.message==='string')).to.be.true;});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":100000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SCH-004 loi 404 (C1) cung cau truc",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('404',()=>pm.response.to.have.status(404));pm.test('co error/message',()=>{const b=pm.response.json();pm.expect((typeof b.error==='string')||(typeof b.message==='string')).to.be.true;});"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"NOTFOUND999\",\"total_amount\":600000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SCH-006 JSON sai cu phap -> 400 khong HTML",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('khong tra HTML/stacktrace',()=>pm.expect(pm.response.text()).to.not.match(/<html|<!DOCTYPE|SyntaxError|at .*:\\d+/i));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":600000,"
+      }
+     }
+    },
+    {
+     "name": "SCH-007 body rong -> 400 JSON",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('khong HTML',()=>pm.expect(pm.response.text()).to.not.match(/<html|<!DOCTYPE/i));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": ""
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "API2-Extend",
+   "item": [
+    {
+     "name": "SETUP tao ma OVER (fixed 999999)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b&&b.id)pm.collectionVariables.set('overId',b.id);if(b)pm.collectionVariables.set('overCode',JSON.parse(pm.request.body.raw).code);pm.test('tao 2xx',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"OVEREXT_{{$timestamp}}\",\"type\":\"fixed\",\"discount_value\":999999,\"min_order_amount\":0,\"expired_at\":\"2099-12-31\",\"max_uses_per_user\":1}"
+      }
+     }
+    },
+    {
+     "name": "EXT-02 fixed > total -> final KHONG duoc am",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();",
+         "pm.test('[SPEC] final_amount >= 0 (khong am)',function(){ if(pm.response.code===200){ pm.expect(b.final_amount).to.be.at.least(0);} });",
+         "pm.test('[SPEC] discount <= total',function(){ if(pm.response.code===200){ pm.expect(b.discount_amount).to.be.at.most(100000);} });",
+         "console.log('[EXT-02] discount=',b.discount_amount,'final=',b.final_amount);"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"{{overCode}}\",\"total_amount\":100000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "EXT-03 tao trung code SAVE10 -> khong 500/khong lo SQL",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('[SPEC] khong tra 500 cho trung code (nen 409)',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "pm.test('[SPEC] khong lo loi SQL noi bo',()=>pm.expect(pm.response.text()).to.not.match(/SQLITE_|UNIQUE constraint|constraint failed/i));",
+         "console.log('[EXT-03] status=',pm.response.code,'body=',pm.response.text().slice(0,120));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"type\":\"fixed\",\"discount_value\":1,\"min_order_amount\":0,\"expired_at\":\"2099-12-31\",\"max_uses_per_user\":1}"
+      }
+     }
+    },
+    {
+     "name": "EXT-04 coupon-usage voi coupon_id khong ton tai",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('[SPEC] tu choi ghi luot cho ma khong ton tai (400/404)',()=>pm.expect([400,404]).to.include(pm.response.code));",
+         "pm.test('khong 500',()=>pm.expect(pm.response.code).to.not.eql(500));",
+         "console.log('[EXT-04] status=',pm.response.code,'body=',pm.response.text().slice(0,120));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/coupon-usage",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "coupon-usage"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"coupon_id\":99999999}"
+      }
+     }
+    },
+    {
+     "name": "EXT-05 X-HTTP-Method-Override: DELETE bi bo qua",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('override bi bo qua (khong phai la thao tac DELETE)',()=>pm.expect(pm.response.code).to.be.oneOf([200,400,401]));",
+         "console.log('[EXT-05] status=',pm.response.code);"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       },
+       {
+        "key": "X-HTTP-Method-Override",
+        "value": "DELETE"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"SAVE10\",\"total_amount\":500000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "SETUP tao ma RACE (max=1)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const b=pm.response.json();if(b&&b.id){pm.collectionVariables.set('raceId',b.id);pm.collectionVariables.set('raceCode',JSON.parse(pm.request.body.raw).code);}pm.test('tao 2xx',()=>pm.expect([200,201]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"RACEEXT_{{$timestamp}}\",\"type\":\"fixed\",\"discount_value\":10000,\"min_order_amount\":0,\"expired_at\":\"2099-12-31\",\"max_uses_per_user\":1}"
+      }
+     }
+    },
+    {
+     "name": "EXT-01a apply lan 1 (chua ghi luot)",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('lan 1 = 200',()=>pm.response.to.have.status(200));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"{{raceCode}}\",\"total_amount\":400000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "EXT-01b apply lan 2 (VAN chua ghi luot) - lo TOCTOU",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('[GHI NHAN] apply lap lai khi chua ghi luot deu 200 => cua so TOCTOU',()=>pm.response.to.have.status(200));",
+         "console.log('[EXT-01] apply lan 2 status=',pm.response.code,' => neu 200: han muc chi kiem luc apply, khong nguyen tu; double-spend kha thi khi ghi luot bi tri hoan/song song');"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Content-Type",
+        "value": "application/json"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{userToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/apply-coupon",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "apply-coupon"
+       ]
+      },
+      "body": {
+       "mode": "raw",
+       "raw": "{\"code\":\"{{raceCode}}\",\"total_amount\":400000,\"user_id\":1}"
+      }
+     }
+    },
+    {
+     "name": "CLEANUP xoa ma OVER/RACE",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('cleanup over',()=>pm.expect([200,204]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "DELETE",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons/{{overId}}",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons",
+        "{{overId}}"
+       ]
+      }
+     }
+    },
+    {
+     "name": "CLEANUP xoa ma RACE",
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "pm.test('cleanup race',()=>pm.expect([200,204]).to.include(pm.response.code));"
+        ]
+       }
+      }
+     ],
+     "request": {
+      "method": "DELETE",
+      "header": [
+       {
+        "key": "X-Student-Id",
+        "value": "{{studentId}}"
+       },
+       {
+        "key": "Authorization",
+        "value": "Bearer {{adminToken}}"
+       }
+      ],
+      "url": {
+       "raw": "{{baseUrl}}/api/admin/coupons/{{raceId}}",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "api",
+        "admin",
+        "coupons",
+        "{{raceId}}"
+       ]
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "variable": [
+  {
+   "key": "studentId",
+   "value": "23127362"
+  },
+  {
+   "key": "adminToken",
+   "value": ""
+  },
+  {
+   "key": "userToken",
+   "value": ""
+  },
+  {
+   "key": "tokenB",
+   "value": ""
+  },
+  {
+   "key": "uidA",
+   "value": ""
+  },
+  {
+   "key": "uidB",
+   "value": ""
+  },
+  {
+   "key": "idLife",
+   "value": ""
+  },
+  {
+   "key": "idAcc",
+   "value": ""
+  },
+  {
+   "key": "idI1",
+   "value": ""
+  },
+  {
+   "key": "idPriv",
+   "value": ""
+  },
+  {
+   "key": "sfx",
+   "value": ""
+  },
+  {
+   "key": "overId",
+   "value": ""
+  },
+  {
+   "key": "overCode",
+   "value": ""
+  },
+  {
+   "key": "raceId",
+   "value": ""
+  },
+  {
+   "key": "raceCode",
+   "value": ""
+  }
+ ]
+}

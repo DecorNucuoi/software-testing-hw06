@@ -1,0 +1,337 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-hw06-4e5f-8a9b-23127362coll",
+    "name": "EShop-HW06",
+    "description": "HW06 API Testing - MSSV 23127362. Collection moi (smoke). Se bo sung test case tu quy trinh P0->P9.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Bat buoc theo de: moi request deu mang header X-Student-Id",
+          "const sid = pm.environment.get('studentId') || 'UNSET';",
+          "pm.request.headers.upsert({ key: 'X-Student-Id', value: sid });",
+          "",
+          "// In ra Console de lam bang chung anti-cheat",
+          "console.log('[HW06] X-Student-Id =', sid, '->', pm.request.url.toString());"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "API1-FR06-ProductDetail",
+      "item": [
+        {
+          "name": "TC-API1-SMOKE-001 | GET product 1 tra ve 200 + schema dung",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('Co truong id, name, price', () => {",
+                  "  pm.expect(b).to.have.property('id');",
+                  "  pm.expect(b).to.have.property('name');",
+                  "  pm.expect(b).to.have.property('price');",
+                  "});",
+                  "pm.test('price phai la kieu number (schema)', () => {",
+                  "  pm.expect(b.price).to.be.a('number');",
+                  "});",
+                  "pm.test('Response < 2000ms', () => pm.expect(pm.response.responseTime).to.be.below(2000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "1"]
+            }
+          }
+        },
+        {
+          "name": "TC-API1-SMOKE-002 | GET product id khong ton tai",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Theo spec, id khong ton tai nen tra 404. Ghi nhan neu SUT tra khac.",
+                  "pm.test('Khong tra ve 500', () => pm.expect(pm.response.code).to.not.equal(500));",
+                  "console.log('[FR06] GET /products/999999 -> status', pm.response.code);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "999999"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "API2-FR09-Coupon",
+      "item": [
+        {
+          "name": "SETUP | Login user (luu userToken + userId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "if (b.token) { pm.collectionVariables.set('userToken', b.token); pm.environment.set('userToken', b.token); }",
+                  "if (b.user && b.user.id) { pm.environment.set('userId', b.user.id); }",
+                  "console.log('[SETUP] userToken saved:', !!b.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "TC-API2-SMOKE-001 | Apply SAVE10 du nguong (>=300k)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('Co discount_amount va final_amount', () => {",
+                  "  pm.expect(b).to.have.property('discount_amount');",
+                  "  pm.expect(b).to.have.property('final_amount');",
+                  "});",
+                  "// SAVE10 = percent 10%, total 500000 -> discount ky vong 50000 theo spec",
+                  "pm.test('[SPEC] discount = 10% cua 500000 = 50000', () => {",
+                  "  pm.expect(b.discount_amount).to.eql(50000);",
+                  "});",
+                  "console.log('[FR09] discount_amount =', b.discount_amount, '(spec expect 50000)');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"SAVE10\",\n  \"total_amount\": 500000,\n  \"user_id\": {{userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/apply-coupon",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "apply-coupon"]
+            }
+          }
+        },
+        {
+          "name": "TC-API2-SMOKE-002 | Ma EXPIRED phai bi tu choi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// EXPIRED da het han 2020 -> spec doi bi tu choi (400).",
+                  "pm.test('[SPEC] Ma het han khong duoc ap dung (khong 200 kem discount)', () => {",
+                  "  const b = pm.response.json();",
+                  "  const applied = pm.response.code === 200 && b.discount_amount;",
+                  "  pm.expect(applied, 'ma het han ma van ap dung => BUG').to.not.be.ok;",
+                  "});",
+                  "console.log('[FR09] EXPIRED -> status', pm.response.code);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"EXPIRED\",\n  \"total_amount\": 500000,\n  \"user_id\": {{userId}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/apply-coupon",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "apply-coupon"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "API3-FR15-ProductCRUD",
+      "item": [
+        {
+          "name": "SETUP | Login admin (luu adminToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login admin 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "if (b.token) { pm.collectionVariables.set('adminToken', b.token); pm.environment.set('adminToken', b.token); }",
+                  "console.log('[SETUP] adminToken saved:', !!b.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "login"]
+            }
+          }
+        },
+        {
+          "name": "TC-API3-SEC-001 | POST product KHONG token phai bi chan (401/403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// SEC-02/SEC-03: endpoint admin phai yeu cau token hop le.",
+                  "// Assert theo SPEC (dung), KHONG assert theo hanh vi sai hien tai.",
+                  "// Neu test nay FAIL -> da lo bug thieu phan quyen o FR-15.",
+                  "pm.test('[SPEC] Tao san pham khong token phai bi tu choi', () => {",
+                  "  pm.expect([401, 403]).to.include(pm.response.code);",
+                  "});",
+                  "console.log('[FR15][SEC] POST /products no-token -> status', pm.response.code, '(spec expect 401/403)');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Hacker Product no-auth\",\n  \"price\": 1,\n  \"description\": \"khong token\",\n  \"imageUrl\": \"\",\n  \"category_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "TC-API3-SMOKE-001 | Admin tao san pham hop le (201/200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Tao san pham thanh cong', () => {",
+                  "  pm.expect([200, 201]).to.include(pm.response.code);",
+                  "});",
+                  "const b = pm.response.json();",
+                  "if (b.id) { pm.collectionVariables.set('productId', b.id); pm.environment.set('productId', b.id); }",
+                  "console.log('[FR15] created productId =', b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"San pham test HW06\",\n  \"price\": 123000,\n  \"description\": \"tao boi admin\",\n  \"imageUrl\": \"http://x\",\n  \"category_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          }
+        },
+        {
+          "name": "TC-API3-BVA-001 | Gia am (-1) phai bi tu choi",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// FR-15: gia phai la so duong (>0). Gia -1 la khong hop le.",
+                  "pm.test('[SPEC] Gia am bi tu choi (400)', () => {",
+                  "  pm.expect(pm.response.code).to.eql(400);",
+                  "});",
+                  "console.log('[FR15][BVA] price=-1 -> status', pm.response.code, '(spec expect 400)');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gia am\",\n  \"price\": -1,\n  \"description\": \"\",\n  \"imageUrl\": \"\",\n  \"category_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "adminToken", "value": "" },
+    { "key": "userToken", "value": "" },
+    { "key": "productId", "value": "" }
+  ]
+}
