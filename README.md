@@ -53,9 +53,9 @@ Căn cứ chi tiết từng hạng mục (điểm con trong ngoặc, cột "Ch�
 
 | Hạng mục | Yêu cầu đề | Đã làm | Chứng cứ |
 |----------|-----------|--------|----------|
-| Generate (10) | ≥35 TC do AI sinh, không bịa | **64 TC** (Domain 25 · State 12 · Security 17 · Schema 10) | `testcases/test_summary_api1.md`, `postman/EShop_API1.postman_collection.json` |
-| Audit (5) | Gắn nhãn VALID/INVALID/INCOMPLETE | 64 VALID · 0 INVALID · nêu điểm cần vá khi thực thi | `testcases/test_summary_api1.md` §Audit |
-| Extend (5) | ≥5 TC AI bỏ sót + lý do | **5 TC** | `testcases/extend_api1.md` |
+| Generate (10) | ≥35 TC do AI sinh, không bịa | **64 TC** (Domain 25 · State 12 · Security 17 · Schema 10) | `testcases/testcases_api1_extended.md`, `postman/EShop_API1.postman_collection.json` |
+| Audit (5) | Gắn nhãn VALID/INVALID/INCOMPLETE | 64 VALID · 0 INVALID · nêu điểm cần vá khi thực thi | `testcases/testcases_api1_extended.md` §Audit |
+| Extend (5) | ≥5 TC AI bỏ sót + lý do | **6 TC** | `testcases/testcases_api1_extended.md` |
 | Execute (5) | Chạy Newman, có evidence | 68 request · 181 assert · **146 pass / 35 fail** | `newman/newman-report-api1.html` |
 | Bug (5) | Báo cáo bug thật | **8 bug** (2 Critical: SQLi `?search` lộ mật khẩu, plaintext password) | `bugs/bug_report.md` |
 
@@ -63,9 +63,9 @@ Căn cứ chi tiết từng hạng mục (điểm con trong ngoặc, cột "Ch�
 
 | Hạng mục | Yêu cầu | Đã làm | Chứng cứ |
 |----------|---------|--------|----------|
-| Generate (10) | ≥35 TC | **91 TC** (Domain 56 · State 9 · Security 19 · Schema 10) — có Decision Table 17 rule | `testcases/test_summary_api2.md` |
-| Audit (5) | Gắn nhãn | 91 VALID · 0 INVALID · **3 BLOCKED** (nêu rõ lý do hạ tầng) | `testcases/test_summary_api2.md` §Audit |
-| Extend (5) | ≥5 TC | **5 TC** | `testcases/extend_api2.md` |
+| Generate (10) | ≥35 TC | **91 TC** (Domain 56 · State 9 · Security 19 · Schema 10) — có Decision Table 17 rule | `testcases/testcases_api2_extended.md` |
+| Audit (5) | Gắn nhãn | 91 VALID · 0 INVALID · **3 BLOCKED** (nêu rõ lý do hạ tầng) | `testcases/testcases_api2_extended.md` §Audit |
+| Extend (5) | ≥5 TC | **5 TC** | `testcases/testcases_api2_extended.md` |
 | Execute (5) | Newman | 69 request · 168 assert · **139 pass / 29 fail** | `newman/newman-report-api2.html` |
 | Bug (5) | Bug thật | **6 bug** (1 Critical: công thức percent ra tiền âm) | `bugs/bug_report.md` |
 
@@ -73,9 +73,9 @@ Căn cứ chi tiết từng hạng mục (điểm con trong ngoặc, cột "Ch�
 
 | Hạng mục | Yêu cầu | Đã làm | Chứng cứ |
 |----------|---------|--------|----------|
-| Generate (10) | ≥35 TC | **89 TC** (Domain 31 · State 8 · Security 21 · Schema 29) | `testcases/test_summary_api3.md` |
-| Audit (5) | Gắn nhãn | 89 VALID · 0 INVALID (sửa 2 TC assert sai response) | `testcases/test_summary_api3.md` §Audit |
-| Extend (5) | ≥5 TC | **5 TC** (gồm bug phá huỷ dữ liệu khi PUT một phần) | `testcases/extend_api3.md` |
+| Generate (10) | ≥35 TC | **89 TC** (Domain 31 · State 8 · Security 21 · Schema 29) | `testcases/testcases_api3_extended.md` |
+| Audit (5) | Gắn nhãn | 89 VALID · 0 INVALID (sửa 2 TC assert sai response) | `testcases/testcases_api3_extended.md` §Audit |
+| Extend (5) | ≥5 TC | **5 TC** (gồm bug phá huỷ dữ liệu khi PUT một phần) | `testcases/testcases_api3_extended.md` |
 | Execute (5) | Newman | 51 request · 125 assert · **89 pass / 36 fail** | `newman/newman-report-api3.html` |
 | Bug (5) | Bug thật | **6 bug** (1 Critical: CRUD không xác thực) | `bugs/bug_report.md` |
 
@@ -99,16 +99,16 @@ Căn cứ chi tiết từng hạng mục (điểm con trong ngoặc, cột "Ch�
 
 | API | Endpoint | Generated (AI) | Added (extend) | Executed | Passed | Failed | Bugs |
 |-----|----------|:--------------:|:--------------:|:--------:|:------:|:------:|:----:|
-| API 1 | `GET /products/:id` | 64 | 5 | 181 | 146 | 35 | 8 |
+| API 1 | `GET /products/:id` | 64 | 6 | 181 | 146 | 35 | 8 |
 | API 2 | `POST /apply-coupon` | 91 | 5 | 168 | 139 | 29 | 6 |
 | API 3 | `POST/PUT/DELETE /products` | 89 | 5 | 125 | 89 | 36 | 6 |
-| **Tổng** | — | **244** | **15** | **474** | **374** | **100** | **20** |
+| **Tổng** | — | **244** | **16** | **474** | **374** | **100** | **20** |
 
 > **Cách đếm:** *Generated / Added* đếm ở mức **test case** (số AI sinh / số tự thêm khi extend). *Executed / Passed / Failed* đếm ở mức **assertion (check)** do Newman báo cáo. Ngoài ra API 2 còn **3 test case gắn nhãn BLOCKED** (không dựng được trạng thái cần hạ tầng: mã inactive, token hết hạn, toggle is_active) nên không nằm trong phần chạy tự động.
 
 **3 bug Critical:** (1) SQLi ở `GET /api/products?search=` rút được email + mật khẩu plaintext; (2) FR-09 công thức percent tính ra `final_amount` lớn hơn cả tổng đơn (tiền âm); (3) FR-15 CRUD sản phẩm không yêu cầu xác thực — ai cũng sửa/xóa được.
 
-> **Lưu ý đọc kết quả:** mọi assertion FAIL đều **assert theo spec (hành vi đúng)**, nên FAIL = phát hiện bug của SUT, **không phải** test sai. Chi tiết tách bạch "fail do bug logic" vs "an toàn trước injection" nằm trong từng `test_summary_*.md` và `bug_report.md`.
+> **Lưu ý đọc kết quả:** mọi assertion FAIL đều **assert theo spec (hành vi đúng)**, nên FAIL = phát hiện bug của SUT, **không phải** test sai. Chi tiết tách bạch "fail do bug logic" vs "an toàn trước injection" nằm trong từng `testcases_api*_extended.md` và `bug_report.md`.
 
 ---
 
