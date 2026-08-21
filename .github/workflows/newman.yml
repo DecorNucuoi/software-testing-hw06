@@ -1,0 +1,49 @@
+name: API Tests (Newman)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Checkout SUT
+        uses: actions/checkout@v4
+        with:
+          repository: ttbhanh/eshop-sut
+          path: sut
+
+      - name: Start EShop backend
+        run: |
+          cd sut/backend
+          npm install
+          node database.js
+          nohup node server.js &
+          npx wait-on http://localhost:3000/api/products --timeout 60000
+
+      - name: Install Newman
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run API tests
+        run: |
+          newman run postman/EShop_HW06.postman_collection.json \
+            -e postman/EShop_HW06.postman_environment.json \
+            --env-var "baseUrl=http://localhost:3000" \
+            --env-var "studentId=23127362" \
+            -r cli,htmlextra \
+            --reporter-htmlextra-export newman/ci-report.html
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: newman/ci-report.html
