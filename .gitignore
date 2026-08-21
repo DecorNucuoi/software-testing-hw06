@@ -7,3 +7,6 @@ Thumbs.db
 desktop.ini
 *.tmp
 ~$*
+
+# Ke hoach ca nhan - khong day len git
+00_plan/
